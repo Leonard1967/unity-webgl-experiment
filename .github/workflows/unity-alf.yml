@@ -1,8 +1,21 @@
 ﻿name: unity-alf
 on: workflow_dispatch
+
 jobs:
   request:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: game-ci/unity-request-activation-file@v4
+
+      - id: unityver
+        name: Read Unity version from ProjectVersion.txt
+        run: |
+          ver=$(grep m_EditorVersion ProjectSettings/ProjectVersion.txt | awk '{print $2}')
+          echo "version=$ver" >> $GITHUB_OUTPUT
+
+      - name: Request activation file
+        uses: game-ci/unity-request-activation-file@v3
+        with:
+          unityVersion: ${{ steps.unityver.outputs.version }}
